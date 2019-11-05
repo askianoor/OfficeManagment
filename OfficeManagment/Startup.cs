@@ -14,6 +14,7 @@ using Microsoft.Extensions.Options;
 using OfficeManagment.Filters;
 using OfficeManagment.Infrastructure;
 using OfficeManagment.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace OfficeManagment
 {
@@ -39,6 +40,7 @@ namespace OfficeManagment
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        [Obsolete]
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc( opt =>
@@ -68,6 +70,11 @@ namespace OfficeManagment
 
             //Get Office data from appsettings Info Section and put it on the service container
             services.Configure<OfficeInfo>(Configuration.GetSection("Info"));
+
+            //Use an in-memory database for quick development and testing
+            //TODO : Swap out with a real database in production
+            services.AddDbContext<OfficeApiContext>(opt => opt.UseInMemoryDatabase());
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
