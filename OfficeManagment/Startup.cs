@@ -74,6 +74,14 @@ namespace OfficeManagment
                 app.UseDeveloperExceptionPage();
             }
 
+            //2019/11/05  Add Hsts to the project
+            app.UseHsts(opt => 
+            {
+                opt.MaxAge(days: 365);
+                opt.IncludeSubdomains();
+                opt.Preload();
+            });
+
             app.UseMvc();
         }
     }
