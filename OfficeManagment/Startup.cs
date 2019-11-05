@@ -83,6 +83,10 @@ namespace OfficeManagment
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+
+                //Add Some test data for Development Purpose
+                var context = app.ApplicationServices.GetRequiredService<OfficeApiContext>();
+                AddTestData(context);
             }
 
             //2019/11/05  Add Hsts to the project
@@ -94,6 +98,18 @@ namespace OfficeManagment
             });
 
             app.UseMvc();
+        }
+
+        private static void AddTestData(OfficeApiContext context)
+        {
+            context.Rooms.Add(new RoomEntity
+            {
+                Id = Guid.Parse("301df05S-6609-4a5A-0a126ae62c08"),
+                Name = "Dr Noushin Mousavi Room",
+                Rate = 200000
+            });
+
+            context.SaveChanges();
         }
     }
 }
