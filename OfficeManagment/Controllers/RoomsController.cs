@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OfficeManagment.Models;
+using OfficeManagment.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,11 @@ namespace OfficeManagment.Controllers
     [ApiVersion("1.0")]
     public class RoomsController : ControllerBase
     {
-        private readonly OfficeApiContext _context;
+        private readonly IRoomService _roomService;
 
-        public RoomsController(OfficeApiContext context)
+        public RoomsController(IRoomService roomService)
         {
-            _context = context;
+            _roomService = roomService;
         }
 
         [HttpGet(Name = nameof(GetRooms))]
@@ -36,17 +37,10 @@ namespace OfficeManagment.Controllers
         [HttpGet("{roomId}", Name = nameof(GetRoomByIdAsync))]
         public async Task<IActionResult> GetRoomByIdAsync(Guid roomId, CancellationToken ct)
         {
-            var entity = await _context.Rooms.SingleOrDefaultAsync(r => r.Id == roomId, ct);
-            if (entity == null) return NotFound();
+            var room = await _roomService.GetRoomAsync(roomId, ct);
+            if (room == null) return NotFound();
 
-            var resource = new Room
-            {
-                Href = Url.Link(nameof(GetRoomByIdAsync), new { roomId = entity.Id }),
-                Name = entity.Name,
-                Rate = entity.Rate
-            };
-
-            return Ok(resource);
+            return Ok(room);
         }
     }
 }

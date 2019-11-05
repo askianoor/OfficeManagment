@@ -15,6 +15,7 @@ using OfficeManagment.Filters;
 using OfficeManagment.Infrastructure;
 using OfficeManagment.Models;
 using Microsoft.EntityFrameworkCore;
+using OfficeManagment.Services;
 
 namespace OfficeManagment
 {
@@ -75,6 +76,8 @@ namespace OfficeManagment
             //TODO : Swap out with a real database in production
             services.AddDbContext<OfficeApiContext>(opt => opt.UseInMemoryDatabase());
 
+            // Add this line to make a scope for every incoming request as a Default Service
+            services.AddScoped<IRoomService, DefaultRoomService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
