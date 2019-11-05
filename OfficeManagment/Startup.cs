@@ -78,14 +78,14 @@ namespace OfficeManagment
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
 
                 //Add Some test data for Development Purpose
-                var context = app.ApplicationServices.GetRequiredService<OfficeApiContext>();
+                var context = serviceProvider.GetRequiredService<OfficeApiContext>();
                 AddTestData(context);
             }
 
@@ -104,7 +104,7 @@ namespace OfficeManagment
         {
             context.Rooms.Add(new RoomEntity
             {
-                Id = Guid.Parse("301df05S-6609-4a5A-0a126ae62c08"),
+                Id = Guid.Parse("3454e193-4b29-445f-9fa0-d50e824af3fe"),
                 Name = "Dr Noushin Mousavi Room",
                 Rate = 200000
             });
