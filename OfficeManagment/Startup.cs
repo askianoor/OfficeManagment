@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OfficeManagment.Filters;
 using OfficeManagment.Infrastructure;
+using OfficeManagment.Models;
 
 namespace OfficeManagment
 {
@@ -64,6 +65,9 @@ namespace OfficeManagment
                 opt.DefaultApiVersion = new ApiVersion(1, 0);
                 opt.ApiVersionSelector = new CurrentImplementationApiVersionSelector(opt);
             });
+
+            //Get Office data from appsettings Info Section and put it on the service container
+            services.Configure<OfficeInfo>(Configuration.GetSection("Info"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
