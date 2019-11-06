@@ -12,22 +12,20 @@ namespace OfficeManagment.Services
     public class DefaultRoomService : IRoomService
     {
         private readonly OfficeApiContext _context;
+        private readonly IMapper _mapper;
 
-        public DefaultRoomService(OfficeApiContext context)
+        public DefaultRoomService(OfficeApiContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<Room> GetRoomAsync(Guid id, CancellationToken ct)
         {
             var entity = await _context.Rooms.SingleOrDefaultAsync(r => r.Id == id, ct);
             if (entity == null) return null; //NotFound();
-
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<RoomEntity, Room>());
-
-            var mapper = new Mapper(config);
-
-            return mapper.Map<Room>(entity);
+            
+            return _mapper.Map<Room>(entity);
 
             //var resource = new Room
             //{
