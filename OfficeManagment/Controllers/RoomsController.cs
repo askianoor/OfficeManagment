@@ -38,6 +38,7 @@ namespace OfficeManagment.Controllers
         public async Task<IActionResult> GetRoomByIdAsync(Guid roomId, CancellationToken ct)
         {
             var room = await _roomService.GetRoomAsync(roomId, ct);
+
             if (room == null) return NotFound();
 
             return Ok(room);

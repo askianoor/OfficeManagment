@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using OfficeManagment.Models;
 
@@ -12,7 +13,7 @@ namespace OfficeManagment.Services
     {
         private readonly OfficeApiContext _context;
 
-        private DefaultRoomService(OfficeApiContext context)
+        public DefaultRoomService(OfficeApiContext context)
         {
             _context = context;
         }
@@ -22,14 +23,20 @@ namespace OfficeManagment.Services
             var entity = await _context.Rooms.SingleOrDefaultAsync(r => r.Id == id, ct);
             if (entity == null) return null; //NotFound();
 
-            var resource = new Room
-            {
-                Href = null, // Url.Link(nameof(GetRoomByIdAsync), new { roomId = entity.Id }),
-                Name = entity.Name,
-                Rate = entity.Rate
-            };
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<RoomEntity, Room>());
 
-            return resource;
+            var mapper = new Mapper(config);
+
+            return mapper.Map<Room>(entity);
+
+            //var resource = new Room
+            //{
+            //    Href = null, // Url.Link(nameof(GetRoomByIdAsync), new { roomId = entity.Id }),
+            //    Name = entity.Name,
+            //    Rate = entity.Rate
+            //};
+
+            //return resource;
         }
     }
 }

@@ -16,6 +16,7 @@ using OfficeManagment.Infrastructure;
 using OfficeManagment.Models;
 using Microsoft.EntityFrameworkCore;
 using OfficeManagment.Services;
+using AutoMapper;
 
 namespace OfficeManagment
 {
@@ -78,6 +79,9 @@ namespace OfficeManagment
 
             // Add this line to make a scope for every incoming request as a Default Service
             services.AddScoped<IRoomService, DefaultRoomService>();
+
+            //Add AutoMapper to the Project
+            services.AddAutoMapper(typeof(MappingProfile));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
