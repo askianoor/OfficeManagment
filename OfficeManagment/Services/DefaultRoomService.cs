@@ -26,15 +26,6 @@ namespace OfficeManagment.Services
             if (entity == null) return null; //NotFound();
             
             return _mapper.Map<Room>(entity);
-
-            //var resource = new Room
-            //{
-            //    Href = null, // Url.Link(nameof(GetRoomByIdAsync), new { roomId = entity.Id }),
-            //    Name = entity.Name,
-            //    Rate = entity.Rate
-            //};
-
-            //return resource;
         }
     }
 }

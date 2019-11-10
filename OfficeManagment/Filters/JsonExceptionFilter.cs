@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment.Filters
 {
+    /// <summary>
+    /// Unexpected Exception Handling Resposne
+    /// </summary>
     public class JsonExceptionFilter : IExceptionFilter
     {
         private readonly IHostingEnvironment _env;
