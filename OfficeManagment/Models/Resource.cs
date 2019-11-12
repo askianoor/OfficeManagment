@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment.Models
 {
-    public abstract class Resource
+    public abstract class Resource : Link
     {
-        //Add JsonProperty line to ensure Href will be at the top of our Json File (Base On Self Documentation of Ion+json)
-        [JsonProperty( Order = -2)]
-        public string Href { get; set; }
+        [JsonIgnore]
+        public Link Self { get; set; }
     }
 }
