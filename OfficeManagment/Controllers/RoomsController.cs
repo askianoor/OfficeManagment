@@ -22,10 +22,19 @@ namespace OfficeManagment.Controllers
             _roomService = roomService;
         }
 
-        [HttpGet(Name = nameof(GetRooms))]
-        public IActionResult GetRooms()
+        [HttpGet(Name = nameof(GetRoomsAsync))]
+        public async Task<IActionResult> GetRoomsAsync(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var rooms = await _roomService.GetRoomsAsync(ct);
+
+            var collectionLink = Link.ToCollection(nameof(GetRoomsAsync));
+            var collection = new Collection<Room>
+            {
+                Self = collectionLink,
+                value = rooms.ToArray()
+            };
+
+            return Ok(collection);
         }
 
         /// <summary>
