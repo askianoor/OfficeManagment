@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment.Models
 {
-    //Define a class for Ion Collection Type
-    public class Collection<T> : Resource
+    public class OpeningEntity : BookingRange
     {
-        public T[] Value { get; set; }
+        public Guid RoomId { get; set; }
+
+        public int Rate { get; set; }
     }
 }

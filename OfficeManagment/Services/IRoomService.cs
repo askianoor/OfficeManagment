@@ -11,6 +11,10 @@ namespace OfficeManagment.Services
     {
         Task<Room> GetRoomAsync(Guid id, CancellationToken ct);
 
-        Task<IEnumerable<Room>> GetRoomsAsync(CancellationToken ct);
+        Task<PagedResults<Room>> GetRoomsAsync(
+            PagingOptions pagingOptions,
+            SortOptions<Room, RoomEntity> sortOptions,
+            SearchOptions<Room, RoomEntity> searchOptions,
+            CancellationToken ct);
     }
 }

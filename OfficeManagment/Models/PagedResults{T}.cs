@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment.Models
 {
-    //Define a class for Ion Collection Type
-    public class Collection<T> : Resource
+    public class PagedResults<T>
     {
-        public T[] Value { get; set; }
+        public IEnumerable<T> Items { get; set; }
+
+        public int TotalSize { get; set; }
     }
 }

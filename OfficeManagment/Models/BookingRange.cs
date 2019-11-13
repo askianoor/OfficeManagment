@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment.Models
 {
-    //Define a class for Ion Collection Type
-    public class Collection<T> : Resource
+    public class BookingRange
     {
-        public T[] Value { get; set; }
+        public DateTimeOffset StartAt { get; set; }
+
+        public DateTimeOffset EndAt { get; set; }
     }
 }

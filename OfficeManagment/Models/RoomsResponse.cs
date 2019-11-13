@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment.Models
 {
-    //Define a class for Ion Collection Type
-    public class Collection<T> : Resource
+    public class RoomsResponse : PagedCollection<Room>
     {
-        public T[] Value { get; set; }
+        public Link Openings { get; set; }
     }
 }
