@@ -58,6 +58,12 @@ namespace OfficeManagment
                     var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
                     opt.OutputFormatters.Remove(jsonFormatter);
                     opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));
+
+                    //Cache Profiles
+                    opt.CacheProfiles.Add("Static", new CacheProfile
+                    {
+                        Duration = 86400
+                    });
                 })
                 .AddJsonOptions(opt =>
                 {

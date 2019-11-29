@@ -30,7 +30,7 @@ namespace OfficeManagment.Models
         public Link Last { get; set; }
 
         public static PagedCollection<T> Create(Link self, T[] items, int size, PagingOptions pagingOptions)
-    => Create<PagedCollection<T>>(self, items, size, pagingOptions);
+            => Create<PagedCollection<T>>(self, items, size, pagingOptions);
 
         public static TResponse Create<TResponse>(Link self, T[] items, int size, PagingOptions pagingOptions)
             where TResponse : PagedCollection<T>, new()

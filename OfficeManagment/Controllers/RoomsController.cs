@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using OfficeManagment.Infrastructure;
 using OfficeManagment.Models;
 using OfficeManagment.Services;
 using System;
@@ -61,6 +62,8 @@ namespace OfficeManagment.Controllers
                 pagingOptions);
 
             collection.Openings = Link.ToCollection(nameof(GetAllRoomOpeningsAsync));
+
+            collection.RoomsQuery = FormMetadata.FromResource<Room>(Link.ToForm(nameof(GetRoomsAsync), null, Link.GetMethod, Form.QueryRelation));
 
             return Ok(collection);
         }

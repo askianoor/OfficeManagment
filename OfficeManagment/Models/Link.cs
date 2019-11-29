@@ -9,7 +9,8 @@ namespace OfficeManagment.Models
 {
     public class Link
     {
-        public const string GetMethod = "Get";
+        public const string GetMethod = "GET";
+        public const string PostMethod = "POST";
 
         public static Link To(string routeName, object routeValues = null) => new Link
         {
@@ -26,6 +27,19 @@ namespace OfficeManagment.Models
             Method = GetMethod,
             Relations = new string[] {"collection"}
         };
+
+        public static Link ToForm(
+            string routeName,
+            object routeValues = null,
+            string method = PostMethod,
+            params string[] relations)
+            => new Link
+            {
+                RouteName = routeName,
+                RouteValues = routeValues,
+                Method = method,
+                Relations = relations
+            };
 
         [JsonProperty(Order = -5)]
         public string Href { get; set; }

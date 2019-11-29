@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using OfficeManagment.Infrastructure;
 using OfficeManagment.Models;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,16 @@ namespace OfficeManagment.Controllers
         }
 
         [HttpGet(Name = nameof(GetInfo))]
+        [ResponseCache(CacheProfileName = "Static")]
+        [Etag]
         public IActionResult GetInfo()
         {
             _officeInfo.Href = Url.Link(nameof(GetInfo), null);
+
+            if (!Request.GetEtagHandler().NoneMatch(_officeInfo))
+            {
+                return StatusCode(304, _officeInfo);
+            }
 
             return Ok(_officeInfo);
         }
