@@ -102,6 +102,9 @@ namespace OfficeManagment
 
             //Add AutoMapper to the Project
             services.AddAutoMapper(typeof(MappingProfile));
+
+            //Add Server side Response Caching
+            services.AddResponseCaching();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -117,13 +120,16 @@ namespace OfficeManagment
                 AddTestData(context);//, dateLogicService);
             }
 
-            //2019/11/05  Add Hsts to the project
+            //2019/11/05 Add Hsts to the project
             app.UseHsts(opt => 
             {
                 opt.MaxAge(days: 365);
                 opt.IncludeSubdomains();
                 opt.Preload();
             });
+
+            //Add Server side Response Caching
+            app.UseResponseCaching();
 
             app.UseMvc();
         }
