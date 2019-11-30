@@ -19,6 +19,8 @@ using OfficeManagment.Services;
 using AutoMapper;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
+using AspNet.Security.OpenIdConnect.Primitives;
+using OpenIddict.Validation;
 
 namespace OfficeManagment
 {
@@ -56,6 +58,7 @@ namespace OfficeManagment
                     opt.SslPort = _httpsPort;
                     opt.Filters.Add(typeof(RequireHttpsAttribute));
 
+                    //Change Json Format to the Ion+json Format
                     var jsonFormatter = opt.OutputFormatters.OfType<JsonOutputFormatter>().Single();
                     opt.OutputFormatters.Remove(jsonFormatter);
                     opt.OutputFormatters.Add(new IonOutputFormatter(jsonFormatter));
@@ -91,9 +94,48 @@ namespace OfficeManagment
             services.Configure<OfficeOptions>(Configuration);
             services.Configure<PagingOptions>(Configuration.GetSection("DefaultPagingOptions"));
 
-            //Use an in-memory database for quick development and testing
-            //TODO : Swap out with a real database in production
-            services.AddDbContext<OfficeApiContext>(opt => opt.UseInMemoryDatabase());
+            services.AddDbContext<OfficeApiContext>(opt => {
+                //Use an in-memory database for quick development and testing
+                //TODO : Swap out with a real database in production
+                opt.UseInMemoryDatabase();
+                //Add OpenIddict to use Security TOKEN
+                opt.UseOpenIddict();
+                });
+
+            // Add OpenIddict services
+            services.AddOpenIddict()
+                .AddCore(opt =>
+                {
+                    opt.UseEntityFrameworkCore()
+                    .UseDbContext<OfficeApiContext>()
+                    .ReplaceDefaultEntities<Guid>();
+                })
+                .AddServer(opt =>
+                {
+                    opt.UseMvc();
+                    opt.EnableTokenEndpoint("/token");
+                    opt.AllowPasswordFlow();
+                    opt.AcceptAnonymousClients();
+                    opt.SetAccessTokenLifetime(TimeSpan.FromDays(180));
+                })
+                .AddValidation();
+
+            // ASP.NET Core Identity should use the same claim names as OpenIddict
+            services.Configure<IdentityOptions>(opt =>
+            {
+                opt.ClaimsIdentity.UserNameClaimType = OpenIdConnectConstants.Claims.Name;
+                opt.ClaimsIdentity.UserIdClaimType = OpenIdConnectConstants.Claims.Subject;
+                opt.ClaimsIdentity.RoleClaimType = OpenIdConnectConstants.Claims.Role;
+            });
+
+            // Add Authentication and set some defaults
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultScheme = OpenIddictValidationDefaults.AuthenticationScheme;
+            });
+
+            // Add ASP.NET Core Identity Services 
+            //AddIdentityCoreServices(services);
 
             // Add this line to make a scope for every incoming request as a Default Service
             services.AddScoped<IRoomService, DefaultRoomService>();
@@ -120,15 +162,18 @@ namespace OfficeManagment
             {
                 app.UseDeveloperExceptionPage();
 
-                //Add Some test data for Development Purpose ONLY
-                var context = serviceProvider.GetRequiredService<OfficeApiContext>();
-                var dateLogicService = app.ApplicationServices.GetRequiredService<IDateLogicService>();
-                AddTestData(context, dateLogicService);
+                using (IServiceScope scope = app.ApplicationServices.CreateScope())
+                {
+                    //Add Some test data for Development Purpose ONLY
+                    var context = serviceProvider.GetRequiredService<OfficeApiContext>();
+                    var dateLogicService = scope.ServiceProvider.GetRequiredService<IDateLogicService>();
+                    AddTestData(context, dateLogicService);
 
-                //Add Test Users data for Development Purpose ONLY
-                var roleManager = app.ApplicationServices.GetRequiredService <RoleManager<UserRoleEntity>>();
-                var userManager = app.ApplicationServices.GetRequiredService<UserManager<UserEntity>>();
-                AddTestUser(roleManager, userManager).Wait();
+                    RoleManager<UserRoleEntity> roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<UserRoleEntity>>();
+                    UserManager<UserEntity> userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserEntity>>();
+
+                    AddTestUser(roleManager, userManager).Wait();
+                }
             }
 
             //2019/11/05 Add Hsts to the project
@@ -139,12 +184,19 @@ namespace OfficeManagment
                 opt.Preload();
             });
 
+            //Add OpenIddict And OAuth
+            app.UseAuthentication();
+
             //Add Server side Response Caching
             app.UseResponseCaching();
 
             app.UseMvc();
         }
 
+        /// <summary>
+        ///  Development User Test Purpose
+        /// </summary>
+        /// <returns>Admin User</returns>
         private static async Task AddTestUser(RoleManager<UserRoleEntity> roleManager, UserManager<UserEntity> userManager)
         {
             //Add a Test Role
@@ -166,6 +218,10 @@ namespace OfficeManagment
             await userManager.UpdateAsync(user);
         }
 
+
+        /// <summary>
+        ///  Development Test Purpose
+        /// </summary>
         private static void AddTestData(OfficeApiContext context, IDateLogicService dateLogicService)
         {
             context.Rooms.Add(new RoomEntity
