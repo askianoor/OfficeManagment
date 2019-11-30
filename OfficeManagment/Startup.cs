@@ -153,6 +153,12 @@ namespace OfficeManagment
             services.AddIdentity<UserEntity, UserRoleEntity>()
                 .AddEntityFrameworkStores<OfficeApiContext>()
                 .AddDefaultTokenProviders();
+
+            //Add Admin Policies Role Authorization
+            services.AddAuthorization( opt => 
+            {
+                opt.AddPolicy("ViewAllUsersPolicy", p => p.RequireAuthenticatedUser().RequireRole("Admin"));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

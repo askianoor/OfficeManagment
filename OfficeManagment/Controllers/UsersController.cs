@@ -6,6 +6,7 @@ using OfficeManagment.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OfficeManagment.Controllers
@@ -46,13 +47,11 @@ namespace OfficeManagment.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                var canSeeEveryone = await _authzService.AuthorizeAsync(
-                    User, "ViewAllUsersPolicy");
+                var canSeeEveryone = await _authzService.AuthorizeAsync(User, "ViewAllUsersPolicy");
                 if (canSeeEveryone.Succeeded)
                 {
                     // Executive, view everyone                
-                    users = await _userService.GetUsersAsync(
-                        pagingOptions, sortOptions, searchOptions);
+                    users = await _userService.GetUsersAsync(pagingOptions, sortOptions, searchOptions);
                 }
                 else // Only return self
                 {
@@ -78,6 +77,19 @@ namespace OfficeManagment.Controllers
             */
 
             return collection;
+        }
+
+        // Get User Detail
+        [Authorize]
+        [HttpGet("me", Name = nameof(GetMeAsync))]
+        public async Task<IActionResult> GetMeAsync(CancellationToken ct)
+        {
+            if (User == null) return BadRequest();
+
+            var user = await _userService.GetUserAsync(User);
+            if (user == null) return NotFound();
+
+            return Ok(user);
         }
 
         [Authorize]
