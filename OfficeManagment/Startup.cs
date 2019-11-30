@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using OfficeManagment.Services;
 using AutoMapper;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace OfficeManagment
 {
@@ -105,6 +106,11 @@ namespace OfficeManagment
 
             //Add Server side Response Caching
             services.AddResponseCaching();
+
+            //Add ASP.Net Core Identity
+            services.AddIdentity<UserEntity, UserRoleEntity>()
+                .AddEntityFrameworkStores<OfficeApiContext>()
+                .AddDefaultTokenProviders();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -114,10 +120,15 @@ namespace OfficeManagment
             {
                 app.UseDeveloperExceptionPage();
 
-                //Add Some test data for Development Purpose
+                //Add Some test data for Development Purpose ONLY
                 var context = serviceProvider.GetRequiredService<OfficeApiContext>();
-                //var dateLogicService = app.ApplicationServices.GetRequiredService<IDateLogicService>();
-                AddTestData(context);//, dateLogicService);
+                var dateLogicService = app.ApplicationServices.GetRequiredService<IDateLogicService>();
+                AddTestData(context, dateLogicService);
+
+                //Add Test Users data for Development Purpose ONLY
+                var roleManager = app.ApplicationServices.GetRequiredService <RoleManager<UserRoleEntity>>();
+                var userManager = app.ApplicationServices.GetRequiredService<UserManager<UserEntity>>();
+                AddTestUser(roleManager, userManager).Wait();
             }
 
             //2019/11/05 Add Hsts to the project
@@ -134,7 +145,28 @@ namespace OfficeManagment
             app.UseMvc();
         }
 
-        private static void AddTestData(OfficeApiContext context)//, IDateLogicService dateLogicService)
+        private static async Task AddTestUser(RoleManager<UserRoleEntity> roleManager, UserManager<UserEntity> userManager)
+        {
+            //Add a Test Role
+            await roleManager.CreateAsync(new UserRoleEntity("Admin"));
+
+            //Add a Test User
+            var user = new UserEntity()
+            {
+                Email = "Admin@Office.local",
+                UserName = "Admin@Office.local",
+                FirstName = "Ali",
+                LastName = "Kianoor",
+                CreatedAt = DateTimeOffset.UtcNow
+            };
+            await userManager.CreateAsync(user,"AdminPassword@123");
+
+            //Put the user in the admin role
+            await userManager.AddToRoleAsync(user, "Admin");
+            await userManager.UpdateAsync(user);
+        }
+
+        private static void AddTestData(OfficeApiContext context, IDateLogicService dateLogicService)
         {
             context.Rooms.Add(new RoomEntity
             {
@@ -152,16 +184,16 @@ namespace OfficeManagment
             }).Entity;
 
             var today = DateTimeOffset.Now;
-            //var start = dateLogicService.AlignStartTime(today);
-            //var end = start.Add(dateLogicService.GetMinimumStay());
+            var start = dateLogicService.AlignStartTime(today);
+            var end = start.Add(dateLogicService.GetMinimumStay());
 
             context.Bookings.Add(new BookingEntity
             {
                 Id = Guid.Parse("2eac8dea-2749-42b3-9d21-8eb2fc0fd6bd"),
                 Room = oxford,
                 CreatedAt = DateTimeOffset.UtcNow,
-                //StartAt = start,
-                //EndAt = end,
+                StartAt = start,
+                EndAt = end,
                 Total = oxford.Rate,
             });
 

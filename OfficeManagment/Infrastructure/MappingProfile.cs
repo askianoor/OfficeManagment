@@ -36,6 +36,12 @@ namespace OfficeManagment.Infrastructure
                     Link.To(
                         nameof(Controllers.RoomsController.GetRoomByIdAsync),
                         new { roomId = src.Id })));
+
+            //Add User Route Mapping
+            CreateMap<UserEntity, User>()
+                .ForMember(dest => dest.Self, opt => opt.MapFrom(src =>
+                    Link.To(nameof(Controllers.UsersController.GetUserById),
+                    new { userId = src.Id })));
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OfficeManagment.Models;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace OfficeManagment
 {
-    public class OfficeApiContext : DbContext
+    //Change DbContext to the IdentityDbContext
+    public class OfficeApiContext : IdentityDbContext<UserEntity,UserRoleEntity,Guid>
     {
         public OfficeApiContext(DbContextOptions options) : base(options) { }
 
